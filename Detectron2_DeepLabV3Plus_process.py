@@ -155,7 +155,7 @@ class Detectron2_DeepLabV3PlusProcessFactory(dataprocess.CProcessFactory):
         # Code source repository
         self.info.repository = "https://github.com/facebookresearch/detectron2"
         # Keywords used for search
-        self.info.keywords = "semantic, segmentation, detectron2, facebook, atrous"
+        self.info.keywords = "semantic, segmentation, detectron2, facebook, atrous, convolution, encoder, decoder"
 
     def create(self, param=None):
         # Create process object
