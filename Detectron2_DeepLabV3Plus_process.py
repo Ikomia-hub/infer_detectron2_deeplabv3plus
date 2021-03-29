@@ -1,5 +1,7 @@
+import update_path
 from ikomia import core, dataprocess
 import copy
+
 # Your imports below
 
 from detectron2.checkpoint import DetectionCheckpointer
