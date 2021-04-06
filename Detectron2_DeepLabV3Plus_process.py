@@ -109,7 +109,8 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             dstImage = np.argmax(pred,axis=0)
 
             # Set image of input/output (numpy array):
-            mask_output.setImage(dstImage)
+            # dstImage +1 because value 0 is for background but no background here
+            mask_output.setImage(dstImage+1)
 
             # Create random color map
             n = self.cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES
