@@ -53,6 +53,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
         self.model = None
         self.cfg = None
+        self.colors = None
         # Create parameters class
         if param is None:
             self.setParam(Detectron2_DeepLabV3PlusParam())
@@ -106,20 +107,20 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 pred = pred[0]["sem_seg"].cpu().numpy()
 
             # Convert logits to labelled image
-            dstImage = np.argmax(pred,axis=0)
-
+            dstImage = (np.argmax(pred,axis=0)).astype(dtype=np.uint8)
             # Set image of input/output (numpy array):
             # dstImage +1 because value 0 is for background but no background here
             mask_output.setImage(dstImage+1)
 
             # Create random color map
-            n = self.cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES
-            colors = [[0, 0, 0]]
-            for i in range(n):
-                colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
+            if self.colors == None :
+                n = self.cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES
+                self.colors = [[0, 0, 0]]
+                for i in range(n):
+                    self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
 
-            # Apply color map on labelled image
-            self.setOutputColorMap(1, 0, colors)
+                # Apply color map on labelled image
+                self.setOutputColorMap(1, 0, self.colors)
 
             self.forwardInputImage(0, 1)
         # Step progress bar:
