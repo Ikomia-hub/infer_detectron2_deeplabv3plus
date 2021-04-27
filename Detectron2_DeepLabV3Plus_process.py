@@ -5,11 +5,15 @@ import copy
 # Your imports below
 
 from detectron2.checkpoint import DetectionCheckpointer
-from detectron2.config import CfgNode
+from detectron2.config import CfgNode,get_cfg
 from detectron2.modeling import build_model
+from detectron2.projects.deeplab.config import add_deeplab_config
+from torchvision.transforms import Resize
 import torch
 import numpy as np
 import random
+import os
+import wget
 
 # --------------------
 # - Class to handle the process parameters
@@ -22,12 +26,14 @@ class Detectron2_DeepLabV3PlusParam(core.CProtocolTaskParam):
         # Place default value initialization here
         self.configFile=""
         self.modelFile=""
+        self.dataset="Cityscapes"
 
     def setParamMap(self, paramMap):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
         self.configFile = paramMap["configFile"]
         self.modelFile = paramMap["modelFile"]
+        self.dataset = paramMap["dataset"]
         pass
 
     def getParamMap(self):
@@ -36,6 +42,7 @@ class Detectron2_DeepLabV3PlusParam(core.CProtocolTaskParam):
         paramMap = core.ParamMap()
         paramMap["configFile"] = self.configFile
         paramMap["modelFile"] = self.modelFile
+        paramMap["dataset"] = self.dataset
         return paramMap
 
 
@@ -54,6 +61,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         self.model = None
         self.cfg = None
         self.colors = None
+        self.dataset = ""
         # Create parameters class
         if param is None:
             self.setParam(Detectron2_DeepLabV3PlusParam())
@@ -88,18 +96,39 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 cfg_data = file.read()
                 self.cfg = CfgNode.load_cfg(cfg_data)
 
-        if self.model is None and self.cfg is not None and param.modelFile!="":
+        if param.dataset == "Cityscapes":
+            url = "https://dl.fbaipublicfiles.com/detectron2/DeepLab/Cityscapes-" \
+                  "SemanticSegmentation/deeplab_v3_plus_R_103_os16_mg124_poly_90k_bs16/" \
+                  "28054032/model_final_a8a355.pkl"
+            self.cfg = get_cfg()
+            cfg_file = os.path.join(os.path.dirname(__file__),os.path.join("configs","deeplab_v3_plus_R_103_os16_mg124_poly_90k_bs16.yaml"))
+            add_deeplab_config(self.cfg)
+            self.cfg.merge_from_file(cfg_file)
+            self.cfg.MODEL.WEIGHTS = url
+            if not torch.cuda.is_available():
+                self.cfg.MODEL.DEVICE = "cpu"
+                self.cfg.MODEL.RESNETS.NORM = "BN"
+                self.cfg.MODEL.SEM_SEG_HEAD.NORM = "BN"
+            self.model = build_model(self.cfg)
+            DetectionCheckpointer(self.model).load(self.cfg.MODEL.WEIGHTS)
+
+        elif self.model is None and self.cfg is not None and param.modelFile!="":
+            self.cfg.INPUT.CROP.ENABLED= False
             self.model=build_model(self.cfg)
             DetectionCheckpointer(self.model).load(param.modelFile)
-            self.model.eval()
 
         if self.model is not None and srcImage is not None :
             # Convert numpy image to detectron2 input format
+            self.model.eval()
             input={}
             h,w,c = np.shape(srcImage)
-            input["image"]=torch.tensor(srcImage).permute(2,0,1)
-            input["height"]=h
-            input["width"]=w
+            input["image"] = (torch.tensor(srcImage).permute(2, 0, 1))
+
+            if param.dataset == "Cityscapes":
+                input["image"]=Resize([512,1024])(input["image"])
+
+            input["height"]= h
+            input["width"]= w
 
             # Inference with pretrained model
             with torch.no_grad():

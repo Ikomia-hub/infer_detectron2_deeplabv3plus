@@ -23,22 +23,47 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
         # Create layout : QGridLayout by default
         self.gridLayout = QGridLayout()
 
-        qlabelConfigFile = QLabel("Select a config file (.yaml) :")
+        self.qcomboLabel = QLabel("Trained on")
+        self.combo_dataset = QComboBox()
+        self.combo_dataset.addItem("Custom")
+        self.combo_dataset.addItem("Cityscapes")
+        self.combo_dataset.setCurrentIndex(0 if self.parameters.dataset == "Custom" else 1)
+        self.combo_dataset.currentIndexChanged.connect(self.on_combo_dataset_changed)
+
+        self.qlabelConfigFile = QLabel("Select a config file (.yaml) :")
         self.qbrowseWidgetConfigFile = BrowseFileWidget(path=self.parameters.configFile, mode=QFileDialog.ExistingFile)
 
-        qlabelModelFile = QLabel("Select a model file (.pth) :")
+        self.qlabelModelFile = QLabel("Select a model file (.pth) :")
         self.qbrowseWidgetModelFile = BrowseFileWidget(path=self.parameters.modelFile, mode=QFileDialog.ExistingFile)
 
-        self.gridLayout.addWidget(qlabelConfigFile,0,0,1,1)
-        self.gridLayout.addWidget(self.qbrowseWidgetConfigFile, 0, 1, 1, 2)
-        self.gridLayout.addWidget(qlabelModelFile,1,0,1,1)
-        self.gridLayout.addWidget(self.qbrowseWidgetModelFile, 1, 1, 1, 2)
+        self.gridLayout.addWidget(self.qcomboLabel,0,0,1,1)
+        self.gridLayout.addWidget(self.combo_dataset,0,1,1,2)
+        self.gridLayout.addWidget(self.qlabelConfigFile,1,0,1,1)
+        self.gridLayout.addWidget(self.qbrowseWidgetConfigFile, 1, 1, 1, 2)
+        self.gridLayout.addWidget(self.qlabelModelFile,2,0,1,1)
+        self.gridLayout.addWidget(self.qbrowseWidgetModelFile, 2, 1, 1, 2)
 
         # PyQt -> Qt wrapping
         layout_ptr = utils.PyQtToQt(self.gridLayout)
 
         # Set widget layout
         self.setLayout(layout_ptr)
+        self.qlabelModelFile.setVisible(False)
+        self.qlabelConfigFile.setVisible(False)
+        self.qbrowseWidgetConfigFile.setVisible(False)
+        self.qbrowseWidgetModelFile.setVisible(False)
+
+    def on_combo_dataset_changed(self, index):
+        if self.combo_dataset.itemText(index) == "Cityscapes":
+            self.qlabelModelFile.setVisible(False)
+            self.qlabelConfigFile.setVisible(False)
+            self.qbrowseWidgetConfigFile.setVisible(False)
+            self.qbrowseWidgetModelFile.setVisible(False)
+        else:
+            self.qlabelModelFile.setVisible(True)
+            self.qlabelConfigFile.setVisible(True)
+            self.qbrowseWidgetConfigFile.setVisible(True)
+            self.qbrowseWidgetModelFile.setVisible(True)
 
     def onApply(self):
         # Apply button clicked slot
@@ -48,7 +73,7 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
         # Send signal to launch the process
         self.parameters.configFile= self.qbrowseWidgetConfigFile.qedit_file.text()
         self.parameters.modelFile= self.qbrowseWidgetModelFile.qedit_file.text()
-
+        self.parameters.dataset = self.combo_dataset.currentText()
         self.emitApply(self.parameters)
 
 
