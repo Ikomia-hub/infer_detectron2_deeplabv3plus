@@ -48,22 +48,23 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
 
         # Set widget layout
         self.setLayout(layout_ptr)
-        self.qlabelModelFile.setVisible(False)
-        self.qlabelConfigFile.setVisible(False)
-        self.qbrowseWidgetConfigFile.setVisible(False)
-        self.qbrowseWidgetModelFile.setVisible(False)
+        if self.parameters.dataset != "Custom":
+            self.qlabelModelFile.setEnabled(False)
+            self.qlabelConfigFile.setEnabled(False)
+            self.qbrowseWidgetConfigFile.setEnabled(False)
+            self.qbrowseWidgetModelFile.setEnabled(False)
 
     def on_combo_dataset_changed(self, index):
-        if self.combo_dataset.itemText(index) == "Cityscapes":
-            self.qlabelModelFile.setVisible(False)
-            self.qlabelConfigFile.setVisible(False)
-            self.qbrowseWidgetConfigFile.setVisible(False)
-            self.qbrowseWidgetModelFile.setVisible(False)
+        if self.combo_dataset.itemText(index) != "Custom":
+            self.qlabelModelFile.setEnabled(False)
+            self.qlabelConfigFile.setEnabled(False)
+            self.qbrowseWidgetConfigFile.setEnabled(False)
+            self.qbrowseWidgetModelFile.setEnabled(False)
         else:
-            self.qlabelModelFile.setVisible(True)
-            self.qlabelConfigFile.setVisible(True)
-            self.qbrowseWidgetConfigFile.setVisible(True)
-            self.qbrowseWidgetModelFile.setVisible(True)
+            self.qlabelModelFile.setEnabled(True)
+            self.qlabelConfigFile.setEnabled(True)
+            self.qbrowseWidgetConfigFile.setEnabled(True)
+            self.qbrowseWidgetModelFile.setEnabled(True)
 
     def onApply(self):
         # Apply button clicked slot

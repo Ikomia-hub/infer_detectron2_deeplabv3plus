@@ -13,7 +13,6 @@ import torch
 import numpy as np
 import random
 import os
-import wget
 
 # --------------------
 # - Class to handle the process parameters
@@ -113,7 +112,6 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             DetectionCheckpointer(self.model).load(self.cfg.MODEL.WEIGHTS)
 
         elif self.model is None and self.cfg is not None and param.modelFile!="":
-            self.cfg.INPUT.CROP.ENABLED= False
             self.model=build_model(self.cfg)
             DetectionCheckpointer(self.model).load(param.modelFile)
 
