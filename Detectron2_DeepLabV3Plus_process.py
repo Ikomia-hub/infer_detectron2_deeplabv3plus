@@ -13,7 +13,6 @@ import torch
 import numpy as np
 import random
 import os
-import wget
 
 # --------------------
 # - Class to handle the process parameters
