@@ -19,7 +19,6 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
             self.parameters = processMod.Detectron2_DeepLabV3PlusParam()
         else:
             self.parameters = param
-
         # Create layout : QGridLayout by default
         self.gridLayout = QGridLayout()
 
@@ -75,6 +74,7 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
         self.parameters.configFile= self.qbrowseWidgetConfigFile.qedit_file.text()
         self.parameters.modelFile= self.qbrowseWidgetModelFile.qedit_file.text()
         self.parameters.dataset = self.combo_dataset.currentText()
+        self.parameters.update = True
         self.emitApply(self.parameters)
 
 
