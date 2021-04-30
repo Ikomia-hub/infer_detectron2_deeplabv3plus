@@ -13,6 +13,7 @@ import torch
 import numpy as np
 import random
 import os
+import cv2
 
 # --------------------
 # - Class to handle the process parameters
@@ -57,6 +58,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         # add output + set data type
         self.setOutputDataType(core.IODataType.IMAGE_LABEL, 0)
         self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
+        self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
         self.model = None
         self.cfg = None
         self.colors = None
@@ -86,7 +88,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
 
         # Get output :
         mask_output = self.getOutput(0)
-        graph_output = self.getOutput(1)
+        graph_output = self.getOutput(2)
 
         # Get parameters :
         param = self.getParam()
@@ -109,11 +111,9 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 self.cfg.merge_from_file(cfg_file)
                 self.cfg.MODEL.WEIGHTS = url
 
-                self.classes = ['unlabeled','ego vehicle','rectification border','out of roi','static','dynamic',
-                                'ground','road''sidewalk','parking','rail track','building','wall','fence','guard rail',
-                                'bridge''tunnel''pole','polegroup','traffic light','traffic sign','vegetation','terrain',
-                                'sky''person','rider','car','truck','bus' ,'caravan','trailer' ,'train','motorcycle',
-                                'bicycle','license plate']
+                self.classes =['ignore','road','sidewalk','building','wall','fence','pole','traffic light','traffic sign'
+                                ,'vegetation','terrain','sky','person','rider','car','truck','bus' ,
+                                'train','motorcycle','bicycle']
 
             elif self.cfg is not None:
                 self.cfg.MODEL.WEIGHTS = param.modelFile
@@ -126,8 +126,6 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             self.model=build_model(self.cfg)
             DetectionCheckpointer(self.model).load(self.cfg.MODEL.WEIGHTS)
             self.model.eval()
-
-            param.update = False
 
         if self.model is not None and srcImage is not None :
             # Convert numpy image to detectron2 input format
@@ -153,8 +151,8 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             mask_output.setImage(dstImage+1)
 
             # Create random color map
-            if self.colors == None :
-                n = self.cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES
+            if self.colors == None or param.update :
+                n = len(self.classes)
                 self.colors = [[0, 0, 0]]
                 for i in range(n-1):
                     self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
@@ -162,12 +160,37 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 # Apply color map on labelled image
                 self.setOutputColorMap(1, 0, self.colors)
             self.forwardInputImage(0, 1)
+
+            graph_output.setImage(self.draw_key())
+            param.update = False
+
         # Step progress bar:
         self.emitStepProgress()
 
         # Call endTaskRun to finalize process
         self.endTaskRun()
 
+    def draw_key(self):
+        img_h = 1000
+        img_w = 1000
+        max_height = 100
+        rectangle_height = min(max_height,img_h // len(self.colors))
+        rectangle_width = img_w // 3
+        offset_x = 10
+        offset_y = 5
+        interline = 5
+        legend = np.full((img_h, img_w, 3), dtype=np.int, fill_value=255)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        fontscale = 1
+        thickness = 2
+        for i, c in enumerate(self.colors):
+            legend = cv2.rectangle(legend, (offset_x, i * rectangle_height + offset_y + interline),
+                                   (offset_x + rectangle_width, (i + 1) * rectangle_height + offset_y - interline),
+                                   color=c, thickness=-1)
+            legend = cv2.putText(legend,self.classes[i],(3*offset_x+rectangle_width,(i+1)*rectangle_height+
+                                                           offset_y-interline - rectangle_height//3),
+                                  font, fontscale, color=[0,0,0], thickness=thickness)
+        return legend
 
 # --------------------
 # - Factory class to build process object
