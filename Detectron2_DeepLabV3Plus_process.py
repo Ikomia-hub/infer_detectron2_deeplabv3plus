@@ -62,6 +62,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         self.colors = None
         self.dataset = ""
         self.update = False
+        self.classes = None
         # Create parameters class
         if param is None:
             self.setParam(Detectron2_DeepLabV3PlusParam())
@@ -95,6 +96,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             with open(param.configFile, 'r') as file:
                 cfg_data = file.read()
                 self.cfg = CfgNode.load_cfg(cfg_data)
+                self.classes=self.cfg.CLASS_NAMES
 
         if self.model is None or param.update:
             if param.dataset == "Cityscapes":
@@ -106,6 +108,12 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 add_deeplab_config(self.cfg)
                 self.cfg.merge_from_file(cfg_file)
                 self.cfg.MODEL.WEIGHTS = url
+
+                self.classes = ['unlabeled','ego vehicle','rectification border','out of roi','static','dynamic',
+                                'ground','road''sidewalk','parking','rail track','building','wall','fence','guard rail',
+                                'bridge''tunnel''pole','polegroup','traffic light','traffic sign','vegetation','terrain',
+                                'sky''person','rider','car','truck','bus' ,'caravan','trailer' ,'train','motorcycle',
+                                'bicycle','license plate']
 
             elif self.cfg is not None:
                 self.cfg.MODEL.WEIGHTS = param.modelFile
@@ -148,12 +156,11 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             if self.colors == None :
                 n = self.cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES
                 self.colors = [[0, 0, 0]]
-                for i in range(n):
+                for i in range(n-1):
                     self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
 
                 # Apply color map on labelled image
                 self.setOutputColorMap(1, 0, self.colors)
-
             self.forwardInputImage(0, 1)
         # Step progress bar:
         self.emitStepProgress()
