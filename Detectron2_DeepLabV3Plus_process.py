@@ -161,7 +161,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 self.setOutputColorMap(1, 0, self.colors)
             self.forwardInputImage(0, 1)
 
-            graph_output.setImage(self.draw_key())
+            graph_output.setImage(self.draw_legend())
             param.update = False
 
         # Step progress bar:
@@ -170,7 +170,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         # Call endTaskRun to finalize process
         self.endTaskRun()
 
-    def draw_key(self):
+    def draw_legend(self):
         img_h = 1000
         img_w = 1000
         max_height = 100
