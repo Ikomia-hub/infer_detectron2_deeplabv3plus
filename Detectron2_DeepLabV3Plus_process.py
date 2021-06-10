@@ -109,7 +109,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
                 self.cfg.merge_from_file(cfg_file)
                 self.cfg.MODEL.WEIGHTS = url
 
-                self.classes = ['ignore', 'road', 'sidewalk', 'building', 'wall', 'fence', 'pole', 'traffic light',
+                self.classes = ['road', 'sidewalk', 'building', 'wall', 'fence', 'pole', 'traffic light',
                                 'traffic sign', 'vegetation', 'terrain', 'sky', 'person', 'rider', 'car', 'truck',
                                 'bus', 'train', 'motorcycle', 'bicycle']
 
@@ -146,13 +146,13 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             dstImage = (np.argmax(pred, axis=0)).astype(dtype=np.uint8)
             # Set image of input/output (numpy array):
             # dstImage +1 because value 0 is for background but no background here
-            mask_output.setImage(dstImage+1)
+            mask_output.setImage(dstImage)
 
             # Create random color map
             if self.colors is None or param.update:
                 n = len(self.classes)
-                self.colors = [[0, 0, 0]]
-                for i in range(n-1):
+                self.colors = []
+                for i in range(n):
                     self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
 
                 # Apply color map on labelled image
