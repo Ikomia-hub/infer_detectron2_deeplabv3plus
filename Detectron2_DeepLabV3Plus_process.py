@@ -149,7 +149,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
             mask_output.setImage(dstImage+1)
 
             # Create random color map
-            if self.colors == None or param.update:
+            if self.colors is None or param.update:
                 n = len(self.classes)
                 self.colors = [[0, 0, 0]]
                 for i in range(n-1):
@@ -177,17 +177,21 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
         offset_x = 10
         offset_y = 5
         interline = 5
-        legend = np.full((img_h, img_w, 3), dtype=np.int, fill_value=255)
+        legend = np.full((img_h, img_w, 3), dtype="uint8", fill_value=255)
         font = cv2.FONT_HERSHEY_SIMPLEX
         fontscale = 1
         thickness = 2
+
         for i, c in enumerate(self.colors):
-            legend = cv2.rectangle(legend, (offset_x, i * rectangle_height + offset_y + interline),
+            legend = cv2.rectangle(legend,
+                                   (offset_x, i * rectangle_height + offset_y + interline),
                                    (offset_x + rectangle_width, (i + 1) * rectangle_height + offset_y - interline),
-                                   color=c, thickness=-1)
-            legend = cv2.putText(legend,self.classes[i],(3*offset_x+rectangle_width,(i+1)*rectangle_height+
-                                                           offset_y-interline - rectangle_height//3),
-                                  font, fontscale, color=[0,0,0], thickness=thickness)
+                                   c, -1)
+            legend = cv2.putText(legend,
+                                 self.classes[i],
+                                 (3*offset_x+rectangle_width, (i+1)*rectangle_height+offset_y-interline-rectangle_height//3),
+                                 font, fontscale, color=[0, 0, 0], thickness=thickness)
+
         return legend
 
 # --------------------
