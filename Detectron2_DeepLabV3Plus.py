@@ -1,6 +1,4 @@
 from ikomia import dataprocess
-import Detectron2_DeepLabV3Plus_process as processMod
-import Detectron2_DeepLabV3Plus_widget as widgetMod
 
 
 # --------------------
@@ -13,9 +11,11 @@ class Detectron2_DeepLabV3Plus(dataprocess.CPluginProcessInterface):
         dataprocess.CPluginProcessInterface.__init__(self)
 
     def getProcessFactory(self):
+        from Detectron2_DeepLabV3Plus.Detectron2_DeepLabV3Plus_process import Detectron2_DeepLabV3PlusProcessFactory
         # Instantiate process object
-        return processMod.Detectron2_DeepLabV3PlusProcessFactory()
+        return Detectron2_DeepLabV3PlusProcessFactory()
 
     def getWidgetFactory(self):
+        from Detectron2_DeepLabV3Plus.Detectron2_DeepLabV3Plus_widget import Detectron2_DeepLabV3PlusWidgetFactory
         # Instantiate associated widget object
-        return widgetMod.Detectron2_DeepLabV3PlusWidgetFactory()
+        return Detectron2_DeepLabV3PlusWidgetFactory()

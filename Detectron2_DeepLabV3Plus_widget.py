@@ -1,8 +1,8 @@
 from ikomia import utils, core, dataprocess
-import Detectron2_DeepLabV3Plus_process as processMod
-
-#PyQt GUI framework
+from Detectron2_DeepLabV3Plus.Detectron2_DeepLabV3Plus_process import Detectron2_DeepLabV3PlusParam
+# PyQt GUI framework
 from PyQt5.QtWidgets import *
+from ikomia.utils import qtconversion
 from ikomia.utils.pyqtutils import BrowseFileWidget
 
 
@@ -10,13 +10,13 @@ from ikomia.utils.pyqtutils import BrowseFileWidget
 # - Class which implements widget associated with the process
 # - Inherits PyCore.CProtocolTaskWidget from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
+class Detectron2_DeepLabV3PlusWidget(core.CWorkflowTaskWidget):
 
     def __init__(self, param, parent):
-        core.CProtocolTaskWidget.__init__(self, parent)
+        core.CWorkflowTaskWidget.__init__(self, parent)
 
         if param is None:
-            self.parameters = processMod.Detectron2_DeepLabV3PlusParam()
+            self.parameters = Detectron2_DeepLabV3PlusParam()
         else:
             self.parameters = param
         # Create layout : QGridLayout by default
@@ -43,7 +43,7 @@ class Detectron2_DeepLabV3PlusWidget(core.CProtocolTaskWidget):
         self.gridLayout.addWidget(self.qbrowseWidgetModelFile, 2, 1, 1, 2)
 
         # PyQt -> Qt wrapping
-        layout_ptr = utils.PyQtToQt(self.gridLayout)
+        layout_ptr = qtconversion.PyQtToQt(self.gridLayout)
 
         # Set widget layout
         self.setLayout(layout_ptr)

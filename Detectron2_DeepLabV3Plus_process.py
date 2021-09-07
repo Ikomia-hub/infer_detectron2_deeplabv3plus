@@ -1,7 +1,6 @@
-import update_path
+from Detectron2_DeepLabV3Plus import update_path
 from ikomia import core, dataprocess
 import copy
-# Your imports below
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
 from detectron2.modeling import build_model
@@ -17,46 +16,46 @@ import cv2
 # - Class to handle the process parameters
 # - Inherits PyCore.CProtocolTaskParam from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusParam(core.CProtocolTaskParam):
+class Detectron2_DeepLabV3PlusParam(core.CWorkflowTaskParam):
 
     def __init__(self):
-        core.CProtocolTaskParam.__init__(self)
+        core.CWorkflowTaskParam.__init__(self)
         # Place default value initialization here
         self.configFile = ""
         self.modelFile = ""
         self.dataset = "Cityscapes"
 
-    def setParamMap(self, paramMap):
+    def setParamMap(self, param_map):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
-        self.configFile = paramMap["configFile"]
-        self.modelFile = paramMap["modelFile"]
-        self.dataset = paramMap["dataset"]
+        self.configFile = param_map["configFile"]
+        self.modelFile = param_map["modelFile"]
+        self.dataset = param_map["dataset"]
         pass
 
     def getParamMap(self):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
-        paramMap = core.ParamMap()
-        paramMap["configFile"] = self.configFile
-        paramMap["modelFile"] = self.modelFile
-        paramMap["dataset"] = self.dataset
-        return paramMap
+        param_map = core.ParamMap()
+        param_map["configFile"] = self.configFile
+        param_map["modelFile"] = self.modelFile
+        param_map["dataset"] = self.dataset
+        return param_map
 
 
 # --------------------
 # - Class which implements the process
 # - Inherits PyCore.CProtocolTask or derived from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
+class Detectron2_DeepLabV3PlusProcess(dataprocess.C2dImageTask):
 
     def __init__(self, name, param):
-        dataprocess.CImageProcess2d.__init__(self, name)
+        dataprocess.C2dImageTask.__init__(self, name)
 
         # add output + set data type
         self.setOutputDataType(core.IODataType.IMAGE_LABEL, 0)
-        self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
-        self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
+        self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
+        self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
         self.model = None
         self.cfg = None
         self.colors = None
@@ -198,10 +197,10 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.CImageProcess2d):
 # - Factory class to build process object
 # - Inherits PyDataProcess.CProcessFactory from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusProcessFactory(dataprocess.CProcessFactory):
+class Detectron2_DeepLabV3PlusProcessFactory(dataprocess.CTaskFactory):
 
     def __init__(self):
-        dataprocess.CProcessFactory.__init__(self)
+        dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
         self.info.name = "Detectron2_DeepLabV3Plus"
         self.info.shortDescription = "DeepLabv3+ inference model of Detectron2 for semantic segmentation."
