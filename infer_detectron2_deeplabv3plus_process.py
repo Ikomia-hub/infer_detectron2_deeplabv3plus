@@ -1,4 +1,4 @@
-from Detectron2_DeepLabV3Plus import update_path
+from infer_detectron2_deeplabv3plus import update_path
 from ikomia import core, dataprocess
 import copy
 from detectron2.checkpoint import DetectionCheckpointer
@@ -12,11 +12,12 @@ import random
 import os
 import cv2
 
+
 # --------------------
 # - Class to handle the process parameters
 # - Inherits PyCore.CProtocolTaskParam from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusParam(core.CWorkflowTaskParam):
+class Deeplabv3plusParam(core.CWorkflowTaskParam):
 
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
@@ -47,7 +48,7 @@ class Detectron2_DeepLabV3PlusParam(core.CWorkflowTaskParam):
 # - Class which implements the process
 # - Inherits PyCore.CProtocolTask or derived from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusProcess(dataprocess.C2dImageTask):
+class DeepLabv3plus(dataprocess.C2dImageTask):
 
     def __init__(self, name, param):
         dataprocess.C2dImageTask.__init__(self, name)
@@ -64,7 +65,7 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.C2dImageTask):
         self.classes = None
         # Create parameters class
         if param is None:
-            self.setParam(Detectron2_DeepLabV3PlusParam())
+            self.setParam(Deeplabv3plusParam())
         else:
             self.setParam(copy.deepcopy(param))
 
@@ -197,12 +198,12 @@ class Detectron2_DeepLabV3PlusProcess(dataprocess.C2dImageTask):
 # - Factory class to build process object
 # - Inherits PyDataProcess.CProcessFactory from Ikomia API
 # --------------------
-class Detectron2_DeepLabV3PlusProcessFactory(dataprocess.CTaskFactory):
+class Deeplabv3plusFactory(dataprocess.CTaskFactory):
 
     def __init__(self):
         dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
-        self.info.name = "Detectron2_DeepLabV3Plus"
+        self.info.name = "infer_detectron2_deeplabv3plus"
         self.info.shortDescription = "DeepLabv3+ inference model of Detectron2 for semantic segmentation."
         self.info.description = "Implementation from Detectron2 (Facebook Research). " \
                                 "This Ikomia plugin can make inference of pre-trained model from " \
@@ -226,4 +227,4 @@ class Detectron2_DeepLabV3PlusProcessFactory(dataprocess.CTaskFactory):
 
     def create(self, param=None):
         # Create process object
-        return Detectron2_DeepLabV3PlusProcess(self.info.name, param)
+        return DeepLabv3plus(self.info.name, param)
