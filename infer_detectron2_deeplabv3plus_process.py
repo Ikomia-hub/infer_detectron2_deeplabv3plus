@@ -211,7 +211,7 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
                                 "plugin Detectron2_DeepLabV3Plus_Train."
         self.info.authors = "Liang-Chieh Chen, Yukun Zhu, George Papandreou, Florian Schroff, Hartwig Adam"
         # relative path -> as displayed in Ikomia application process tree
-        self.info.path = "Plugins/Python/Detectron2"
+        self.info.path = "Plugins/Python/Segmentation"
         self.info.version = "1.0.0"
         self.info.iconPath = "icons/detectron2.png"
         self.info.article = "Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation"
