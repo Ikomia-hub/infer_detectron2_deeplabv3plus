@@ -96,7 +96,8 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
             with open(param.configFile, 'r') as file:
                 cfg_data = file.read()
                 self.cfg = CfgNode.load_cfg(cfg_data)
-                self.classes=self.cfg.CLASS_NAMES
+                self.classes = self.cfg.CLASS_NAMES
+                add_deeplab_config(self.cfg)
 
         if self.model is None or param.update:
             if param.dataset == "Cityscapes":
@@ -104,7 +105,8 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
                       "SemanticSegmentation/deeplab_v3_plus_R_103_os16_mg124_poly_90k_bs16/" \
                       "28054032/model_final_a8a355.pkl"
                 self.cfg = get_cfg()
-                cfg_file = os.path.join(os.path.dirname(__file__), os.path.join("configs", "deeplab_v3_plus_R_103_os16_mg124_poly_90k_bs16.yaml"))
+                cfg_file = os.path.join(os.path.dirname(__file__),
+                                        os.path.join("configs", "deeplab_v3_plus_R_103_os16_mg124_poly_90k_bs16.yaml"))
                 add_deeplab_config(self.cfg)
                 self.cfg.merge_from_file(cfg_file)
                 self.cfg.MODEL.WEIGHTS = url
@@ -121,11 +123,11 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
                 self.cfg.MODEL.RESNETS.NORM = "BN"
                 self.cfg.MODEL.SEM_SEG_HEAD.NORM = "BN"
 
-            self.model=build_model(self.cfg)
+            self.model = build_model(self.cfg)
             DetectionCheckpointer(self.model).load(self.cfg.MODEL.WEIGHTS)
             self.model.eval()
 
-        if self.model is not None and srcImage is not None :
+        if self.model is not None and srcImage is not None:
             # Convert numpy image to detectron2 input format
             input = {}
             h, w, c = np.shape(srcImage)
@@ -189,10 +191,12 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
                                    c, -1)
             legend = cv2.putText(legend,
                                  self.classes[i],
-                                 (3*offset_x+rectangle_width, (i+1)*rectangle_height+offset_y-interline-rectangle_height//3),
+                                 (3 * offset_x + rectangle_width,
+                                  (i + 1) * rectangle_height + offset_y - interline - rectangle_height // 3),
                                  font, fontscale, color=[0, 0, 0], thickness=thickness)
 
         return legend
+
 
 # --------------------
 # - Factory class to build process object
