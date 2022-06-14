@@ -5,6 +5,7 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
 from detectron2.modeling import build_model
 from detectron2.projects.deeplab.config import add_deeplab_config
+from detectron2.projects.deeplab.resnet import build_resnet_deeplab_backbone
 from torchvision.transforms import Resize
 import torch
 import numpy as np
