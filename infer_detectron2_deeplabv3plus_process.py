@@ -11,7 +11,6 @@ import torch
 import numpy as np
 import random
 import os
-import cv2
 
 
 # --------------------
@@ -55,15 +54,14 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
         dataprocess.C2dImageTask.__init__(self, name)
 
         # add output + set data type
-        self.setOutputDataType(core.IODataType.IMAGE_LABEL, 0)
-        self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
-        self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
+        self.addOutput(dataprocess.CSemanticSegIO())
         self.model = None
         self.cfg = None
         self.colors = None
         self.dataset = ""
         self.update = False
         self.classes = None
+
         # Create parameters class
         if param is None:
             self.setParam(Deeplabv3plusParam())
@@ -82,12 +80,11 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
         # we use seed to keep the same color for our masks + boxes + labels (same random each time)
         random.seed(10)
         # Get input :
-        input = self.getInput(0)
-        srcImage = input.getImage()
+        img_input = self.getInput(0)
+        src_image = img_input.getImage()
 
         # Get output :
-        mask_output = self.getOutput(0)
-        graph_output = self.getOutput(2)
+        semantic_output = self.getOutput(1)
 
         # Get parameters :
         param = self.getParam()
@@ -128,11 +125,11 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
             DetectionCheckpointer(self.model).load(self.cfg.MODEL.WEIGHTS)
             self.model.eval()
 
-        if self.model is not None and srcImage is not None:
+        if self.model is not None and src_image is not None:
             # Convert numpy image to detectron2 input format
             input = {}
-            h, w, c = np.shape(srcImage)
-            input["image"] = (torch.tensor(srcImage).permute(2, 0, 1))
+            h, w, c = np.shape(src_image)
+            input["image"] = (torch.tensor(src_image).permute(2, 0, 1))
 
             if param.dataset == "Cityscapes":
                 input["image"] = Resize([512, 1024])(input["image"])
@@ -146,23 +143,23 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
                 pred = pred[0]["sem_seg"].cpu().numpy()
 
             # Convert logits to labelled image
-            dstImage = (np.argmax(pred, axis=0)).astype(dtype=np.uint8)
+            dst_image = (np.argmax(pred, axis=0)).astype(dtype=np.uint8)
             # Set image of input/output (numpy array):
             # dstImage +1 because value 0 is for background but no background here
-            mask_output.setImage(dstImage)
+            semantic_output.setMask(dst_image)
 
             # Create random color map
             if self.colors is None or param.update:
                 n = len(self.classes)
                 self.colors = []
                 for i in range(n):
-                    self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
+                    self.colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
 
                 # Apply color map on labelled image
-                self.setOutputColorMap(1, 0, self.colors)
-            self.forwardInputImage(0, 1)
+                self.setOutputColorMap(0, 1, self.colors)
 
-            graph_output.setImage(self.draw_legend())
+            semantic_output.setClassNames(self.classes, self.colors)
+            self.forwardInputImage(0, 0)
             param.update = False
 
         # Step progress bar:
@@ -170,33 +167,6 @@ class DeepLabv3plus(dataprocess.C2dImageTask):
 
         # Call endTaskRun to finalize process
         self.endTaskRun()
-
-    def draw_legend(self):
-        img_h = 1000
-        img_w = 1000
-        max_height = 100
-        rectangle_height = min(max_height, img_h // len(self.colors))
-        rectangle_width = img_w // 3
-        offset_x = 10
-        offset_y = 5
-        interline = 5
-        legend = np.full((img_h, img_w, 3), dtype="uint8", fill_value=255)
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        fontscale = 1
-        thickness = 2
-
-        for i, c in enumerate(self.colors):
-            legend = cv2.rectangle(legend,
-                                   (offset_x, i * rectangle_height + offset_y + interline),
-                                   (offset_x + rectangle_width, (i + 1) * rectangle_height + offset_y - interline),
-                                   c, -1)
-            legend = cv2.putText(legend,
-                                 self.classes[i],
-                                 (3 * offset_x + rectangle_width,
-                                  (i + 1) * rectangle_height + offset_y - interline - rectangle_height // 3),
-                                 font, fontscale, color=[0, 0, 0], thickness=thickness)
-
-        return legend
 
 
 # --------------------
@@ -217,7 +187,7 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
         self.info.authors = "Liang-Chieh Chen, Yukun Zhu, George Papandreou, Florian Schroff, Hartwig Adam"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
-        self.info.version = "1.0.0"
+        self.info.version = "1.1.0"
         self.info.iconPath = "icons/detectron2.png"
         self.info.article = "Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation"
         self.info.journal = "ECCV 2018"
