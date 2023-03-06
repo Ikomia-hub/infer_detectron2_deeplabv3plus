@@ -1,4 +1,4 @@
-from ikomia import utils, core, dataprocess
+from ikomia import core, dataprocess
 from infer_detectron2_deeplabv3plus.infer_detectron2_deeplabv3plus_process import Deeplabv3plusParam
 # PyQt GUI framework
 from PyQt5.QtWidgets import *
@@ -19,8 +19,9 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
             self.parameters = Deeplabv3plusParam()
         else:
             self.parameters = param
+
         # Create layout : QGridLayout by default
-        self.gridLayout = QGridLayout()
+        self.grid_layout = QGridLayout()
 
         self.qcomboLabel = QLabel("Trained on")
         self.combo_dataset = QComboBox()
@@ -35,18 +36,18 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
         self.qlabelModelFile = QLabel("Select a model file (.pth) :")
         self.qbrowseWidgetModelFile = BrowseFileWidget(path=self.parameters.modelFile, mode=QFileDialog.ExistingFile)
 
-        self.gridLayout.addWidget(self.qcomboLabel,0,0,1,1)
-        self.gridLayout.addWidget(self.combo_dataset,0,1,1,2)
-        self.gridLayout.addWidget(self.qlabelConfigFile,1,0,1,1)
-        self.gridLayout.addWidget(self.qbrowseWidgetConfigFile, 1, 1, 1, 2)
-        self.gridLayout.addWidget(self.qlabelModelFile,2,0,1,1)
-        self.gridLayout.addWidget(self.qbrowseWidgetModelFile, 2, 1, 1, 2)
+        self.grid_layout.addWidget(self.qcomboLabel, 0, 0, 1, 1)
+        self.grid_layout.addWidget(self.combo_dataset, 0, 1, 1, 2)
+        self.grid_layout.addWidget(self.qlabelConfigFile, 1, 0, 1, 1)
+        self.grid_layout.addWidget(self.qbrowseWidgetConfigFile, 1, 1, 1, 2)
+        self.grid_layout.addWidget(self.qlabelModelFile, 2, 0, 1, 1)
+        self.grid_layout.addWidget(self.qbrowseWidgetModelFile, 2, 1, 1, 2)
 
         # PyQt -> Qt wrapping
-        layout_ptr = qtconversion.PyQtToQt(self.gridLayout)
+        layout_ptr = qtconversion.PyQtToQt(self.grid_layout)
 
         # Set widget layout
-        self.setLayout(layout_ptr)
+        self.set_layout(layout_ptr)
         if self.parameters.dataset != "Custom":
             self.qlabelModelFile.setEnabled(False)
             self.qlabelConfigFile.setEnabled(False)
@@ -65,17 +66,15 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
             self.qbrowseWidgetConfigFile.setEnabled(True)
             self.qbrowseWidgetModelFile.setEnabled(True)
 
-    def onApply(self):
+    def on_apply(self):
         # Apply button clicked slot
-
         # Get parameters from widget
-        # Example : self.parameters.windowSize = self.spinWindowSize.value()
         # Send signal to launch the process
-        self.parameters.configFile= self.qbrowseWidgetConfigFile.qedit_file.text()
-        self.parameters.modelFile= self.qbrowseWidgetModelFile.qedit_file.text()
+        self.parameters.configFile = self.qbrowseWidgetConfigFile.qedit_file.text()
+        self.parameters.modelFile = self.qbrowseWidgetModelFile.qedit_file.text()
         self.parameters.dataset = self.combo_dataset.currentText()
         self.parameters.update = True
-        self.emitApply(self.parameters)
+        self.emit_apply(self.parameters)
 
 
 # --------------------
