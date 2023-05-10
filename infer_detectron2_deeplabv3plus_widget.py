@@ -31,7 +31,7 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
         self.combo_dataset.currentIndexChanged.connect(self.on_combo_dataset_changed)
 
         self.qlabelConfigFile = QLabel("Select a config file (.yaml) :")
-        self.qbrowseWidgetConfigFile = BrowseFileWidget(path=self.parameters.config, mode=QFileDialog.ExistingFile)
+        self.qbrowseWidgetConfigFile = BrowseFileWidget(path=self.parameters.config_file, mode=QFileDialog.ExistingFile)
 
         self.qlabelModelFile = QLabel("Select a model file (.pth) :")
         self.qbrowseWidgetModelFile = BrowseFileWidget(path=self.parameters.model_path, mode=QFileDialog.ExistingFile)
@@ -70,7 +70,7 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
         # Apply button clicked slot
         # Get parameters from widget
         # Send signal to launch the process
-        self.parameters.config = self.qbrowseWidgetConfigFile.qedit_file.text()
+        self.parameters.config_file = self.qbrowseWidgetConfigFile.qedit_file.text()
         self.parameters.model_path = self.qbrowseWidgetModelFile.qedit_file.text()
         self.parameters.dataset = self.combo_dataset.currentText()
         self.parameters.update = True

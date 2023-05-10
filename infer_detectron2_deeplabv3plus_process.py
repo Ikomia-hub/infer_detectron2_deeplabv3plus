@@ -21,14 +21,14 @@ class Deeplabv3plusParam(core.CWorkflowTaskParam):
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
         # Place default value initialization here
-        self.config = ""
+        self.config_file = ""
         self.model_path = ""
         self.dataset = "Cityscapes"
 
     def set_values(self, params):
         # Set parameters values from Ikomia application
         # Parameters values are stored as string and accessible like a python dict
-        self.config = params["config"]
+        self.config_file_file = params["config_file"]
         self.model_path = params["model_path"]
         self.dataset = params["dataset"]
         pass
@@ -36,7 +36,7 @@ class Deeplabv3plusParam(core.CWorkflowTaskParam):
     def get_values(self):
         # Send parameters values to Ikomia application
         # Create the specific dict structure (string container)
-        params = {"config": self.config,
+        params = {"config_file": self.config_file,
                   "model_path": self.model_path,
                   "dataset": self.dataset}
         return params
@@ -84,8 +84,8 @@ class DeepLabv3plus(dataprocess.CSemanticSegmentationTask):
             else:
                 print("Model file not found, inference will be run using Cityscapes pretrained model")
 
-        if (self.cfg is None or param.update) and param.config != "":
-            with open(param.config, 'r') as file:
+        if (self.cfg is None or param.update) and param.config_file != "":
+            with open(param.config_file, 'r') as file:
                 cfg_data = file.read()
                 self.cfg = CfgNode.load_cfg(cfg_data)
                 add_deeplab_config(self.cfg)
