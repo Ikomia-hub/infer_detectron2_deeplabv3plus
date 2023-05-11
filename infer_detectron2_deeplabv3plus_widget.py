@@ -34,7 +34,7 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
         self.qbrowseWidgetConfigFile = BrowseFileWidget(path=self.parameters.config_file, mode=QFileDialog.ExistingFile)
 
         self.qlabelModelFile = QLabel("Select a model file (.pth) :")
-        self.qbrowseWidgetModelFile = BrowseFileWidget(path=self.parameters.model_path, mode=QFileDialog.ExistingFile)
+        self.qbrowseWidgetModelFile = BrowseFileWidget(path=self.parameters.model_weight_file, mode=QFileDialog.ExistingFile)
 
         self.grid_layout.addWidget(self.qcomboLabel, 0, 0, 1, 1)
         self.grid_layout.addWidget(self.combo_dataset, 0, 1, 1, 2)
@@ -71,7 +71,7 @@ class Deeplabv3plusWidget(core.CWorkflowTaskWidget):
         # Get parameters from widget
         # Send signal to launch the process
         self.parameters.config_file = self.qbrowseWidgetConfigFile.qedit_file.text()
-        self.parameters.model_path = self.qbrowseWidgetModelFile.qedit_file.text()
+        self.parameters.model_weight_file = self.qbrowseWidgetModelFile.qedit_file.text()
         self.parameters.dataset = self.combo_dataset.currentText()
         self.parameters.update = True
         self.emit_apply(self.parameters)
