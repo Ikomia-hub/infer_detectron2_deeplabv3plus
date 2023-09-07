@@ -19,10 +19,11 @@
     </a> 
 </p>
 
-Implementation from Detectron2 (Facebook Research). This Ikomia plugin can make inference of pre-trained model from a given config file and a weight file produced by the Ikomia plugin Detectron2_DeepLabV3Plus_Train.
+Run DeepLabv3+ inference model of Detectron2 for semantic segmentation.
+
 
 [Insert illustrative image here. Image must be accessible publicly, in algorithm Github repository for example.
-<img src="images/illustration.png"  alt="Illustrative image" width="30%" height="30%">]
+<img src="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_deeplabv3plus/main/icons/output.jpg"  alt="Illustrative image" width="30%" height="30%">]
 
 ## :rocket: Use with Ikomia API
 
@@ -36,11 +37,11 @@ pip install ikomia
 
 #### 2. Create your workflow
 
-[Change the sample image URL to fit algorithm purpose]
 
 ```python
-import ikomia
 from ikomia.dataprocess.workflow import Workflow
+from ikomia.utils.displayIO import display
+
 
 # Init your workflow
 wf = Workflow()
@@ -49,7 +50,10 @@ wf = Workflow()
 algo = wf.add_task(name="infer_detectron2_deeplabv3plus", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://production-media.paperswithcode.com/datasets/Foggy_Cityscapes-0000003414-fb7dc023.jpg")
+
+# Inpect your result
+display(algo.get_image_with_mask())
 ```
 
 ## :sunny: Use with Ikomia Studio
@@ -62,9 +66,11 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 ## :pencil: Set algorithm parameters
 
-[Explain each algorithm parameters]
+- **dataset** (str) - Default 'Cityscapes': Use model trained on the Cityscapes dataset. Use "Custom" if using a custom model.    
+- **config_file** (str, *optional*): Path to the .yaml config file.
+- **model_weight_file** (str, *optional*): Path to model weights file .pth. 
 
-[Change the sample image URL to fit algorithm purpose]
+**Parameters** should be in **strings format**  when added to the dictionary.
 
 ```python
 import ikomia
@@ -76,15 +82,13 @@ wf = Workflow()
 # Add algorithm
 algo = wf.add_task(name="infer_detectron2_deeplabv3plus", auto_connect=True)
 
-algo.set_parameters({
-    "param1": "value1",
-    "param2": "value2",
-    ...
-})
+algo.set_parameters({"dataset": "Cityscapes"})
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://production-media.paperswithcode.com/datasets/Foggy_Cityscapes-0000003414-fb7dc023.jpg")
 
+# Inpect your result
+display(algo.get_image_with_mask())
 ```
 
 ## :mag: Explore algorithm outputs
@@ -102,7 +106,7 @@ wf = Workflow()
 algo = wf.add_task(name="infer_detectron2_deeplabv3plus", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://production-media.paperswithcode.com/datasets/Foggy_Cityscapes-0000003414-fb7dc023.jpg")
 
 # Iterate over outputs
 for output in algo.get_outputs()
@@ -112,6 +116,4 @@ for output in algo.get_outputs()
     output.to_json()
 ```
 
-## :fast_forward: Advanced usage 
 
-[optional]
