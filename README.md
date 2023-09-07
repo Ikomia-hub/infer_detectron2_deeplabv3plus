@@ -22,8 +22,7 @@
 Run DeepLabv3+ inference model of Detectron2 for semantic segmentation.
 
 
-[Insert illustrative image here. Image must be accessible publicly, in algorithm Github repository for example.
-<img src="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_deeplabv3plus/main/icons/output.jpg"  alt="Illustrative image" width="30%" height="30%">]
+<img src="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_deeplabv3plus/main/icons/output.jpg"  alt="Illustrative image" width="30%" height="30%">
 
 ## :rocket: Use with Ikomia API
 
