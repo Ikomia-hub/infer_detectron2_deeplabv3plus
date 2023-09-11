@@ -106,7 +106,7 @@ algo = wf.add_task(name="infer_detectron2_deeplabv3plus", auto_connect=True)
 wf.run_on(url="https://production-media.paperswithcode.com/datasets/Foggy_Cityscapes-0000003414-fb7dc023.jpg")
 
 # Iterate over outputs
-for output in algo.get_outputs()
+for output in algo.get_outputs():
     # Print information
     print(output)
     # Export it to JSON
