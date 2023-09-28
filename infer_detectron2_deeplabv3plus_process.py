@@ -168,10 +168,6 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
         # Set process information as string here
         self.info.name = "infer_detectron2_deeplabv3plus"
         self.info.short_description = "DeepLabv3+ inference model of Detectron2 for semantic segmentation."
-        self.info.description = "Implementation from Detectron2 (Facebook Research). " \
-                                "This Ikomia plugin can make inference of pre-trained model from " \
-                                "a given config file and a weight file produced by the Ikomia " \
-                                "plugin Detectron2_DeepLabV3Plus_Train."
         self.info.authors = "Liang-Chieh Chen, Yukun Zhu, George Papandreou, Florian Schroff, Hartwig Adam"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
@@ -184,7 +180,8 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
         # URL of documentation
         self.info.documentation_link = "https://detectron2.readthedocs.io/index.html"
         # Code source repository
-        self.info.repository = "https://github.com/facebookresearch/detectron2"
+        self.info.repository = "https://github.com/Ikomia-hub/infer_detectron2_deeplabv3plus"
+        self.info.original_repository = "https://github.com/facebookresearch/detectron2"
         # Keywords used for search
         self.info.keywords = "semantic, segmentation, detectron2, facebook, atrous, convolution, encoder, decoder"
 
