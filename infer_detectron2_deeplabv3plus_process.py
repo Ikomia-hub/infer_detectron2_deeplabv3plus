@@ -82,7 +82,8 @@ class DeepLabv3plus(dataprocess.CSemanticSegmentationTask):
             if os.path.exists(param.model_weight_file):
                 param.dataset = "Custom"
             else:
-                print("Model file not found, inference will be run using Cityscapes pretrained model")
+                print(
+                    "Model file not found, inference will be run using Cityscapes pretrained model")
 
         if (self.cfg is None or param.update) and param.config_file != "":
             with open(param.config_file, 'r') as file:
@@ -93,7 +94,8 @@ class DeepLabv3plus(dataprocess.CSemanticSegmentationTask):
 
         if self.model is None or param.update:
             # Set cache dir in the algorithm folder to simplify deployment
-            os.environ["FVCORE_CACHE"] = os.path.join(os.path.dirname(__file__), "models")
+            os.environ["FVCORE_CACHE"] = os.path.join(
+                os.path.dirname(__file__), "models")
 
             if param.dataset == "Cityscapes":
                 url = "https://dl.fbaipublicfiles.com/detectron2/DeepLab/Cityscapes-" \
@@ -134,7 +136,8 @@ class DeepLabv3plus(dataprocess.CSemanticSegmentationTask):
             input_tensor["image"] = (torch.tensor(src_image).permute(2, 0, 1))
 
             if param.dataset == "Cityscapes":
-                input_tensor["image"] = Resize([512, 1024])(input_tensor["image"])
+                input_tensor["image"] = Resize(
+                    [512, 1024])(input_tensor["image"])
 
             input_tensor["height"] = h
             input_tensor["width"] = w
@@ -171,7 +174,7 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
         self.info.authors = "Liang-Chieh Chen, Yukun Zhu, George Papandreou, Florian Schroff, Hartwig Adam"
         # relative path -> as displayed in Ikomia application process tree
         self.info.path = "Plugins/Python/Segmentation"
-        self.info.version = "1.1.2"
+        self.info.version = "1.1.3"
         self.info.icon_path = "icons/detectron2.png"
         self.info.article = "Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation"
         self.info.journal = "ECCV 2018"
@@ -182,6 +185,9 @@ class Deeplabv3plusFactory(dataprocess.CTaskFactory):
         # Code source repository
         self.info.repository = "https://github.com/Ikomia-hub/infer_detectron2_deeplabv3plus"
         self.info.original_repository = "https://github.com/facebookresearch/detectron2"
+        # Python compatibility
+        self.info.min_python_version = "3.8.0"
+        self.info.min_ikomia_version = "0.13.0"
         # Keywords used for search
         self.info.keywords = "semantic, segmentation, detectron2, facebook, atrous, convolution, encoder, decoder"
         self.info.algo_type = core.AlgoType.INFER
